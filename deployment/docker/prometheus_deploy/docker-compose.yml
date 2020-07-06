@@ -4,8 +4,7 @@ services:
     container_name: prometheus
     image: prom/prometheus:v2.19.1
     depends_on:
-    - "vminsert"
-    - "vmselect"
+    - "victoriametrics"
     ports:
         - 9090:9090
     volumes:
@@ -16,23 +15,6 @@ services:
         - '--storage.tsdb.path=/prometheus'
     networks:
         - vm_net
-    restart: always
-
-  vmagent:
-    container_name: vmagent
-    image: victoriametrics/vmagent
-    depends_on:
-      - "victoriametrics"
-    ports:
-      - 8429:8429
-    volumes:
-      - vmagentdata:/vmagentdata
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--promscrape.config=/etc/prometheus/prometheus.yml'
-      - '--remoteWrite.url=http://victoriametrics:8428/api/v1/write'
-    networks:
-      - vm_net
     restart: always
   victoriametrics:
     container_name: victoriametrics
@@ -66,7 +48,7 @@ services:
       - vm_net
     restart: always
 volumes:
-  vmagentdata: {}
+  promdata: {}
   vmdata: {}
   grafanadata: {}
 networks:

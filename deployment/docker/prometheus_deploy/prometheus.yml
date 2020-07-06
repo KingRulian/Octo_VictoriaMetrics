@@ -1,19 +1,18 @@
 global:
     scrape_interval:     10s
     evaluation_interval: 10s
-  
-  remote_write:
-    - url: "http://victoriametrics:8428/api/v1/write"
-  
-  scrape_configs:
-    - job_name: 'prometheus'
-      static_configs:
-        - targets: ['prometheus:9090']
-  
-    - job_name: 'vminsert'
-      static_configs:
-        - targets: ['victoriametrics:8428']
+remote_write:
+  - url: "http://victoriametrics:8428/api/v1/write"
 
-    - job_name: 'node'
-        static_configs:
-          - targets: ['52.213.123.147:9100','52.210.28.139:9100','99.81.238.248:9100','34.246.100.160:9100']
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'vminsert'
+    static_configs:
+      - targets: ['victoriametrics:8428']
+
+  - job_name: 'node'
+      static_configs:
+        - targets: ['52.213.123.147:9100','52.210.28.139:9100','99.81.238.248:9100','34.246.100.160:9100','3.248.159.70']

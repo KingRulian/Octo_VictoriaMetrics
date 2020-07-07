@@ -1,0 +1,6 @@
+type: S3
+config:
+  bucket: jupi-thanos-bucket
+  endpoint: s3.amazonaws.com
+  insecure: true
+  signature_version2: true

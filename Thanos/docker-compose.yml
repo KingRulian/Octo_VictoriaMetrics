@@ -13,10 +13,8 @@ services:
     networks:
         - vm_net
     ports:
-        - 10902: 10902
+        - 10902:10902
     restart: always
-    depends_on:
-        - "querier"
 
   prometheus:
     container_name: prometheus
@@ -49,24 +47,27 @@ services:
         - '--grpc-address=0.0.0.0:10091'
         - '--http-address=0.0.0.0:10902'
         - "--prometheus.url=http://prometheus:9090"
-        - "--objstore.config={type: S3, config: {bucket: jupi-thanos-bucket}}"
-
+        - "--objstore.config-file=bucket.yml"
     depends_on:
         - "prometheus"
     networks:
         - vm_net
+    volumes:
+        - ./bucket.yml:/bucket.yml
     restart: always
+
   thanos-store-gateway:
     container_name: thanos-store-gateway
     image: quay.io/thanos/thanos:v0.13.0
     volumes:
         - ./thanos/:/etc/thanos/
+        - ./bucket.yml:/bucket.yml
     command:
         - 'store'
         - '--grpc-address=0.0.0.0:10091'
         - '--http-address=0.0.0.0:10902'
+        - "--objstore.config-file=bucket.yml"
         - '--data-dir=/tmp/thanos/store'
-        - '--objstore.config={type: S3, config: {bucket: jupi-thanos-bucket}}'
     depends_on:
         - "querier"
     restart: always
@@ -80,9 +81,7 @@ services:
         - 3000:3000
     volumes:
         - grafana_data:/var/lib/grafana
-        - ./grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-        - ./grafana/config.monitoring
+        - ./provisioning/:/etc/grafana/provisioning/
     restart: always
 
 volumes:

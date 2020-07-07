@@ -1,0 +1,92 @@
+version: '3.5'
+services:
+  querier:
+    container_name: querier
+    image: quay.io/thanos/thanos:v0.8.0
+    command:
+        - query
+        - --log.level=debug
+        - --query.replica-label=replica
+        - '--grpc-address=0.0.0.0:10091'
+        - '--http-address=0.0.0.0:10902'
+        - '--store=sidecar:10091'
+    networks:
+        - vm_net
+    ports:
+        - 10902: 10902
+    restart: always
+    depends_on:
+        - "querier"
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.19.1
+    depends_on:
+        - "querier"
+    ports:
+        - 9090:9090
+    volumes:
+        - promdata:/prometheus
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - "--web.enable-lifecycle"
+        - "--storage.tsdb.no-lockfile"
+        - "--storage.tsdb.min-block-duration=10m"
+        - "--storage.tsdb.max-block-duration=10m"
+    networks:
+        - vm_net
+    restart: always
+  
+  sidecar:
+    container_name: sidecar
+    image: quay.io/thanos/thanos:v0.8.0
+    command:
+        - "sidecar"
+        - "--log.level=debug"
+        - "--tsdb.path=/prometheus"
+        - '--grpc-address=0.0.0.0:10091'
+        - '--http-address=0.0.0.0:10902'
+        - "--prometheus.url=http://prometheus:9090"
+        - "--objstore.config={type: S3, config: {bucket: jupi-thanos-bucket}}"
+
+    depends_on:
+        - "prometheus"
+    networks:
+        - vm_net
+    restart: always
+  thanos-store-gateway:
+    container_name: thanos-store-gateway
+    image: quay.io/thanos/thanos:v0.13.0
+    volumes:
+        - ./thanos/:/etc/thanos/
+    command:
+        - 'store'
+        - '--grpc-address=0.0.0.0:10091'
+        - '--http-address=0.0.0.0:10902'
+        - '--data-dir=/tmp/thanos/store'
+        - '--objstore.config={type: S3, config: {bucket: jupi-thanos-bucket}}'
+    depends_on:
+        - "querier"
+    restart: always
+
+  grafana:
+    image: grafana/grafana:7.0.5
+    user: "104"
+    depends_on:
+        - "prometheus"
+    ports:
+        - 3000:3000
+    volumes:
+        - grafana_data:/var/lib/grafana
+        - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+        - ./grafana/config.monitoring
+    restart: always
+
+volumes:
+  promdata: {}
+  grafana_data: {}
+networks:
+  vm_net:

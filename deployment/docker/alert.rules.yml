@@ -1,5 +1,5 @@
 alert: VMJobMissing
-    expr: absent(up{job="my-job"})
+    expr: absent(up{job="node"})
     for: 2m
     labels:
       severity: warning

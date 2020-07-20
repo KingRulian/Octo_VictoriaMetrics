@@ -4,5 +4,5 @@ datasources:
   - name: thanos
     type: prometheus
     access: proxy
-    url: http://querier:10902
+    url: http://victoriametrics:8428
     isDefault: true

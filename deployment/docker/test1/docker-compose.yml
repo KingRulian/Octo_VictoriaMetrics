@@ -27,7 +27,7 @@ services:
     volumes:
       - grafanadata:/var/lib/grafana
       - ./provisioning/:/etc/grafana/provisioning/
-      - ./../../dashboards/logapp_dashboard.json:/var/lib/grafana/dashboards/vm.json
+      - ./../../../dashboards/logapp_dashboard.json:/var/lib/grafana/dashboards/vm.json
     networks:
       - vm_net
     restart: always

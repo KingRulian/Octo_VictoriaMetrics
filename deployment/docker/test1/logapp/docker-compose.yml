@@ -1,0 +1,8 @@
+version: '3.5'
+services:
+  vmagent:
+    container_name: logapp
+    image: julienpirot17/monitoring:1.0.2
+    ports:
+      - 2112:2112
+    restart: always

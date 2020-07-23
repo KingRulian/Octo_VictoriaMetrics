@@ -2,9 +2,6 @@ global:
   scrape_interval:     2s
 
 scrape_configs:
-  - job_name: 'vmagent'
-    static_configs:
-      - targets: ['vmagent:8429']
   - job_name: 'victoriametrics'
     static_configs:
       - targets: ['34.247.193.71:8428']

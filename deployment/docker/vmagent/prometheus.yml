@@ -1,13 +1,10 @@
 global:
-    scrape_interval:     2s
-    evaluation_interval: 2s
-remote_write:
-  - url: "http://34.247.193.71:8428/api/v1/write"
-  
+  scrape_interval:     2s
+
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: 'vmagent'
     static_configs:
-      - targets: ['52.209.217.82:9100']
+      - targets: ['vmagent:8429']
   - job_name: 'victoriametrics'
     static_configs:
       - targets: ['34.247.193.71:8428']

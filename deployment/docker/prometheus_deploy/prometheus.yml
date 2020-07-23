@@ -3,9 +3,6 @@ global:
     evaluation_interval: 2s
   
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['52.209.217.82:9100']
   - job_name: 'victoriametrics'
     static_configs:
       - targets: ['34.247.193.71:8428']
